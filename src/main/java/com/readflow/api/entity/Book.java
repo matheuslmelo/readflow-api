@@ -1,25 +1,31 @@
 package com.readflow.api.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 
 @Entity
-@Table(name = "books")
+@Table(name = "books", uniqueConstraints = {@UniqueConstraint(columnNames = {"title", "author"})})
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotBlank(message = "Title is required.")
+    @Size(min = 2, max = 255, message = "Title must be between 2 and 255 characters")
     private String title;
 
-    @NotNull
+    @NotBlank(message = "Author is required.")
+    @Size(min = 2, max = 100, message = "Author must be between 2 and 100 characters")
     private String author;
 
-    @NotNull
+    @NotNull(message = "Published year is required.")
+    @Min(value = 1900, message = "Published year must be at least 1900.")
+    @Max(value = 2100, message = "Published year must be 2100 or before.")
     private Integer publishedYear;
 
-    @NotNull
+    @NotNull(message = "Total pages are required.")
+    @Min(value = 1, message = "Minimum of total pages allowed is 1.")
+    @Max(value = 1000, message = "Maximum of total pages allowed is 1000.")
     private Integer totalPages;
 
     public Book() {
@@ -60,7 +66,7 @@ public class Book {
         this.publishedYear = publishedYear;
     }
 
-    public @NotNull Integer getTotalPages() {
+    public Integer getTotalPages() {
         return totalPages;
     }
 

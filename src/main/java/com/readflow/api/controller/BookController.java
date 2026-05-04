@@ -2,6 +2,7 @@ package com.readflow.api.controller;
 
 import com.readflow.api.entity.Book;
 import com.readflow.api.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,25 +23,22 @@ public class BookController {
         return ResponseEntity.ok(bookService.findById(id));
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<Book>>getByTitle(@RequestParam String title) {
-        List<Book> books = bookService.findByTitle(title);
-        return ResponseEntity.ok(books);
-    }
-
     @GetMapping
-    public ResponseEntity<List<Book>> getAll() {
+    public ResponseEntity<List<Book>> getByTitle(@RequestParam(required = false) String title) {
+        if (title != null) {
+            return ResponseEntity.ok(bookService.findByTitle(title));
+        }
         return ResponseEntity.ok(bookService.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<Book> create(@RequestBody Book book) {
+    public ResponseEntity<Book> create(@Valid @RequestBody Book book) {
         Book savedBook = bookService.create(book);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Book> update(@PathVariable Long id, @RequestBody Book book){
+    public ResponseEntity<Book> update(@PathVariable Long id, @Valid @RequestBody Book book){
         return ResponseEntity.ok(bookService.update(id, book));
     }
 
