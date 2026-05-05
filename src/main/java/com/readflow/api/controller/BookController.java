@@ -1,5 +1,9 @@
 package com.readflow.api.controller;
 
+import com.readflow.api.dto.BookCreateDTO;
+import com.readflow.api.dto.BookResponseDTO;
+import com.readflow.api.dto.BookUpdateDTO;
+import com.readflow.api.dto.mapper.BookMapper;
 import com.readflow.api.entity.Book;
 import com.readflow.api.service.BookService;
 import jakarta.validation.Valid;
@@ -19,27 +23,32 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Book> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(bookService.findById(id));
+    public ResponseEntity<BookResponseDTO> getById(@PathVariable Long id) {
+        Book book = bookService.findById(id);
+        return ResponseEntity.ok(BookMapper.toResponse(book));
     }
 
     @GetMapping
-    public ResponseEntity<List<Book>> getByTitle(@RequestParam(required = false) String title) {
+    public ResponseEntity<List<BookResponseDTO>> getBooks(@RequestParam(required = false) String title) {
+        List<Book> books = null;
         if (title != null) {
-            return ResponseEntity.ok(bookService.findByTitle(title));
+            books = bookService.findByTitle(title);
+        }else{
+            books = bookService.findAll();
         }
-        return ResponseEntity.ok(bookService.findAll());
+        return ResponseEntity.ok(BookMapper.toResponseList(books));
     }
 
     @PostMapping
-    public ResponseEntity<Book> create(@Valid @RequestBody Book book) {
-        Book savedBook = bookService.create(book);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
+    public ResponseEntity<BookResponseDTO> create(@Valid @RequestBody BookCreateDTO requestDTO) {
+        Book savedBook = bookService.create(requestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(BookMapper.toResponse(savedBook));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Book> update(@PathVariable Long id, @Valid @RequestBody Book book){
-        return ResponseEntity.ok(bookService.update(id, book));
+    @PatchMapping("/{id}")
+    public ResponseEntity<BookResponseDTO> update(@PathVariable Long id, @RequestBody BookUpdateDTO requestDTO){
+        Book book = bookService.update(id,requestDTO);
+        return ResponseEntity.ok(BookMapper.toResponse(book));
     }
 
     @DeleteMapping("/{id}")

@@ -1,27 +1,19 @@
-package com.readflow.api.entity;
+package com.readflow.api.dto;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+public class BookResponseDTO {
 
-@Entity
-@Table(name = "books", uniqueConstraints = {@UniqueConstraint(columnNames = {"title", "author"})})
-public class Book {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String title;
-
     private String author;
-
     private Integer publishedYear;
-
     private Integer totalPages;
 
-    public Book() {
+    public BookResponseDTO() {
     }
 
-    public Book(String title, String author, Integer publishedYear, Integer totalPages) {
+    public BookResponseDTO(Long id, String title, String author,
+                           Integer publishedYear, Integer totalPages) {
+        this.id = id;
         this.title = title;
         this.author = author;
         this.publishedYear = publishedYear;
@@ -30,6 +22,10 @@ public class Book {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {

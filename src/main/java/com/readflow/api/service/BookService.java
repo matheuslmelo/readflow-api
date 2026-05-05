@@ -1,9 +1,13 @@
 package com.readflow.api.service;
 
+import com.readflow.api.dto.BookCreateDTO;
+import com.readflow.api.dto.BookUpdateDTO;
+import com.readflow.api.dto.mapper.BookMapper;
 import com.readflow.api.entity.Book;
 import com.readflow.api.exception.global.exceptions.BookNotFoundException;
 import com.readflow.api.repository.BookRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,27 +35,21 @@ public class BookService {
         return bookRepository.findAll();
     }
 
-    public Book create(Book book) {
-        return bookRepository.save(book);
+    public Book create(@Valid BookCreateDTO requestDTO) {
+        return bookRepository.save(BookMapper.toEntity(requestDTO));
     }
 
     @Transactional
-    public Book update(Long id, Book book) {
+    public Book update(Long id, BookUpdateDTO requestDTO) {
         Book existing = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException("Book not found with id: "+id));
-
-        existing.setTitle(book.getTitle());
-        existing.setAuthor(book.getAuthor());
-        existing.setPublishedYear(book.getPublishedYear());
-        existing.setTotalPages(book.getTotalPages());
-
+        BookMapper.updateEntity(existing,requestDTO);
         return existing;
     }
 
     public void delete(Long id){
-        if (!bookRepository.existsById(id)) {
-            throw new BookNotFoundException("Book not found with id: " + id);
-        }
+        Book existing = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + id));
         bookRepository.deleteById(id);
     }
 }
